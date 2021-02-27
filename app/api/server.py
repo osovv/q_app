@@ -2,7 +2,7 @@ import threading
 import requests
 import argparse
 
-from utils import config_parser
+from app.api.utils import config_parser
 from flask import Flask, request
 
 class Server:
