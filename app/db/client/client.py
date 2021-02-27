@@ -39,3 +39,7 @@ class MySQLConnection:
             connection.execute(f'DROP DATABASE IF EXISTS {self.db_name}')
             connection.execute(f'CREATE DATABASE {self.db_name}')
         return self.get_connection(db_created=True)
+
+    def execute_query(self, query):
+        res = self.connection.execute(query)
+        return res
