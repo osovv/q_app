@@ -6,4 +6,3 @@ def config_parser(config_path):
             k, v = line.split(' = ')
             config[k] = v.split('\n')[0]
         return config
-
