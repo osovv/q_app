@@ -18,6 +18,7 @@ class User(Base):
 
 
 class MusicalComposition(Base):
+    __tablename__ = 'musical_compositions'
     id = Column(Integer, primary_key=True, autoincrement=True, nullable=False)
     user_id = Column(Integer, ForeignKey(f'{User.__tablename__}.{User.id.name}'), nullable=False)
     url = Column(VARCHAR[60], nullable=True)
