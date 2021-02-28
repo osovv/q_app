@@ -30,12 +30,11 @@ class Server:
         self.app.add_url_rule('/shutdown', view_func=self.shutdown)
         self.app.add_url_rule('/', view_func=self.get_home)
         self.app.add_url_rule('/home', view_func=self.get_home)
-        self.app.add_url_rule('/add_user_info', view_func=self.add_user_info(), methods=['POST'])
+        self.app.add_url_rule('/add_user_info', view_func=self.add_user_info, methods=['POST'])
         self.app.add_url_rule('/get_user_info/<username>', view_func=self.get_user_info)
-        self.app.add_url_rule('/get_user_info/<username>', view_func=self.edit_user_info, methods=['PUT'])
+        self.app.add_url_rule('/edit_user_info/<username>', view_func=self.edit_user_info, methods=['PUT'])
 
-
-        self.app.register_error_handler(404, self.page_not_found())
+        self.app.register_error_handler(404, self.page_not_found)
 
     def page_not_found(self, error_description):
         return jsonify(error=str(error_description)), 404
@@ -101,9 +100,19 @@ if __name__ == '__main__':
     config = config_parser(args.config)
     server_host = config['SERVER_HOST']
     server_port = int(config['SERVER_PORT'])
+    db_host = config['DB_HOST']
+    db_port = int(config['DB_PORT'])
+    db_user = config['DB_USER']
+    db_password = config['DB_PASSWORD']
+    db_name = config['DB_NAME']
 
     server = Server(
         host=server_host,
-        port=server_port
+        port=server_port,
+        db_host=db_host,
+        db_port=db_port,
+        user=db_user,
+        password=db_password,
+        db_name=db_name
     )
     server.run_server()
