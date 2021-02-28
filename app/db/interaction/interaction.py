@@ -36,12 +36,12 @@ class DbInteraction:
     def add_user_info(self, username, email, password):
         user = User(username=username, password=password, email=email)
         self.mysql_connection.session.add(user)
-        return self.get_user_info(username, )
+        return self.get_user_info(username)
 
     def get_user_info(self, username):
         user = self.mysql_connection.session.query(User).filter_by(username=username).first()
         if user:
-            self.mysql_connectiofn.session.expire_all()
+            self.mysql_connection.session.expire_all()
             return {'username': user.username, 'email': user.email, 'password': user.password}
         else:
             raise UserNotFoundException('User not found!')
@@ -55,6 +55,6 @@ class DbInteraction:
                 user.password = new_password
             if new_email is not None:
                 user.email = new_email
-            return self.get_user_info(username)
+            return self.get_user_info(username if new_username is None else new_username)
         else:
             raise UserNotFoundException('User not found.')
