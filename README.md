@@ -16,6 +16,6 @@ docker-compose up
 ```
 Now you can connect to API at `0.0.0.0:5005`
 ## Task List
- - [ ] Finish CRUD functionality for user (now only CRU)
+ - [x] Finish CRUD functionality for user (now only CRU)
  - [ ] Write CRUD functionaly for musical compositions
  - [ ] Create simple frontend to visualize users and musical compositions

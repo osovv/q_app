@@ -63,8 +63,7 @@ class DbInteraction:
     def delete_user_info(self, username):
         user = self.postgresql_connection.session.query(User).filter_by(username=username).first()
         if user:
-            self.postgresql_connection.sesion.delete(user)
-            pass
+            self.postgresql_connection.ses1sion.delete(user)
         else:
             raise UserNotFoundException('User not found.')
 

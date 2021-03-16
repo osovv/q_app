@@ -92,7 +92,11 @@ class Server:
             abort(404, description='User not found')
 
     def delete_user_info(self, username):
-        pass
+        try:
+            self.db_interaction.delete_user_info(username)
+            return f'Successfully deleted {username}', 200
+        except UserNotFoundException:
+            abort(404, description='User not found')
 
     def get_users_info(self):
         return self.db_interaction.get_all_users()
