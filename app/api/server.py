@@ -34,7 +34,7 @@ class Server:
         self.app.add_url_rule('/get_user_info/<username>', view_func=self.get_user_info)
         self.app.add_url_rule('/edit_user_info/<username>', view_func=self.edit_user_info, methods=['PUT'])
         self.app.add_url_rule('/delete_user_info/<username>', view_func=self.delete_user_info, methods=['DELETE'])
-        self.app.add_url_rule('/list_users', view_func=self.list_users)
+        self.app.add_url_rule('/get_users_info', view_func=self.get_users_info)
         self.app.register_error_handler(404, self.page_not_found)
 
     def page_not_found(self, error_description):
@@ -94,8 +94,8 @@ class Server:
     def delete_user_info(self, username):
         pass
 
-    def list_users(self):
-        return self.db_interaction.list_all_users()
+    def get_users_info(self):
+        return self.db_interaction.get_all_users()
 
 
 if __name__ == '__main__':

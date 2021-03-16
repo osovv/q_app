@@ -8,8 +8,12 @@ Base = declarative_base()
 
 @dataclass
 class User(Base):
-    __tablename__ = 'users'
+    id: int
+    username: str
+    password: str
+    email: str
 
+    __tablename__ = 'users'
     id = Column(Integer, primary_key=True, autoincrement=True, nullable=False)
     username = Column(VARCHAR(50), nullable=True)
     password = Column(VARCHAR(300), nullable=False)
@@ -21,6 +25,11 @@ class User(Base):
 
 @dataclass
 class MusicalComposition(Base):
+    id: int
+    user_id: int
+    url: str
+    user: User
+
     __tablename__ = 'musical_compositions'
     id = Column(Integer, primary_key=True, autoincrement=True, nullable=False)
     user_id = Column(Integer, ForeignKey(f'{User.__tablename__}.{User.id.name}'), nullable=False)

@@ -68,7 +68,7 @@ class DbInteraction:
         else:
             raise UserNotFoundException('User not found.')
 
-    def list_all_users(self):
+    def get_all_users(self):
         users = self.postgresql_connection.session.query(User).all()
         return jsonify(users)
 
