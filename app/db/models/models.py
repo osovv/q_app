@@ -1,10 +1,12 @@
 from sqlalchemy import Column, Integer, ForeignKey, VARCHAR, UniqueConstraint, SMALLINT
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
+from dataclasses import dataclass
 
 Base = declarative_base()
 
 
+@dataclass
 class User(Base):
     __tablename__ = 'users'
 
@@ -17,6 +19,7 @@ class User(Base):
     UniqueConstraint(email, name='email')
 
 
+@dataclass
 class MusicalComposition(Base):
     __tablename__ = 'musical_compositions'
     id = Column(Integer, primary_key=True, autoincrement=True, nullable=False)

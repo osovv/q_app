@@ -1,26 +1,60 @@
-version: '2.1'
-
+version: '3.8'
 services:
-  mysql_database:
-    container_name: qq_project_mysql_database
-    image: "mysql:latest"
-    environment:
-      MYSQL_DATABASE: some_db
-      MYSQL_ROOT_PASSWORD: pass
-    ports:
-      - 3306:3306
-    healthcheck:
-      test: [ "CMD", "mysqladmin", "-uroot", "-ppass", "ping", "-h", "127.0.0.1" ]
-      timeout: 20s
-      retries: 10
+  db:
+      container_name: flask_app_pg
+      image: postgres:13.2
+      restart: always
+      environment:
+        POSTGRES_USER: root
+        POSTGRES_PASSWORD: pass
+        POSTGRES_DB: flask_app_db
+      ports:
+        - "5432:5432"
+      healthcheck:
+        test: [ "CMD-SHELL", "pg_isready" ]
+        interval: 20s
+        timeout: 10s
+        retries: 10
+      volumes:
+        - ./.cache/infile:/infile
+        - pg_data:/var/lib/postgresql/data/
+  server:
+      container_name: flask_app_server
+      build: ./
+      ports:
+        - "5005:5005"
+      links:
+        - db:db
+      depends_on:
+        db:
+          condition: service_healthy
+volumes:
+  pg_data: {}
 
-  app_server:
-    container_name: qq_project_server
-    build: ./
-    ports:
-      - 5005:5005
-    links:
-      - mysql_database:mysql_database
-    depends_on:
-      mysql_database:
-        condition: service_healthy
+
+#version: '2.1'
+#
+#services:
+#  flask_app_database:
+#    container_name: flask_app_database
+#    image: "mysql:latest"
+#    environment:
+#      MYSQL_DATABASE: some_db
+#      MYSQL_ROOT_PASSWORD: pass
+#    ports:
+#      - 3306:3306
+#    healthcheck:
+#      test: [ "CMD", "mysqladmin", "-uroot", "-ppass", "ping", "-h", "127.0.0.1" ]
+#      timeout: 20s
+#      retries: 10
+#
+#  app_server:
+#    container_name: flask_app_server
+#    build: ./
+#    ports:
+#      - 5005:5005
+#    links:
+#      - flask_app_database:flask_app_database
+#    depends_on:
+#      flask_app_database:
+#        condition: service_healthy

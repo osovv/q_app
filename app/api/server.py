@@ -33,7 +33,8 @@ class Server:
         self.app.add_url_rule('/add_user_info', view_func=self.add_user_info, methods=['POST'])
         self.app.add_url_rule('/get_user_info/<username>', view_func=self.get_user_info)
         self.app.add_url_rule('/edit_user_info/<username>', view_func=self.edit_user_info, methods=['PUT'])
-
+        self.app.add_url_rule('/delete_user_info/<username>', view_func=self.delete_user_info, methods=['DELETE'])
+        self.app.add_url_rule('/list_users', view_func=self.list_users)
         self.app.register_error_handler(404, self.page_not_found)
 
     def page_not_found(self, error_description):
@@ -90,6 +91,12 @@ class Server:
         except UserNotFoundException:
             abort(404, description='User not found')
 
+    def delete_user_info(self, username):
+        pass
+
+    def list_users(self):
+        return self.db_interaction.list_all_users()
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -113,6 +120,6 @@ if __name__ == '__main__':
         db_port=db_port,
         user=db_user,
         password=db_password,
-        db_name=db_name
+        db_name=db_name,
     )
     server.run_server()

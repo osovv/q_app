@@ -1,9 +1,9 @@
 import sqlalchemy
 
 from sqlalchemy.orm import sessionmaker
+from psycopg2 import OperationalError
 
-
-class MySQLConnection:
+class PostgreSQLConnection:
 
     def __init__(self, host, port, user, password, db_name, rebuild_db=False):
         self.user = user
@@ -28,16 +28,15 @@ class MySQLConnection:
 
     def get_connection(self, db_created=False):
         engine = sqlalchemy.create_engine(
-            f'mysql+pymysql://{self.user}:{self.password}@{self.host}:{self.port}/{self.db_name if db_created else ""}',
+            f'postgresql://{self.user}:{self.password}@{self.host}:{self.port}/{self.db_name if db_created else ""}',
             encoding='utf8'
         )
         return engine.connect()
 
     def connect(self):
-        connection = self.get_connection()
-        if self.rebuild_db:
-            connection.execute(f'DROP DATABASE IF EXISTS {self.db_name}')
-            connection.execute(f'CREATE DATABASE {self.db_name}')
+        # if self.rebuild_db:
+        #     connection.execute(f'DROP DATABASE IF EXISTS {self.db_name}')
+        #     connection.execute(f'CREATE DATABASE {self.db_name}')
         return self.get_connection(db_created=True)
 
     def execute_query(self, query):
