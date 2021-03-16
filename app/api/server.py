@@ -12,7 +12,8 @@ from app.db.interaction.interaction import DbInteraction
 
 
 class Server:
-    def __init__(self, host, port, db_host, db_port, user, password, db_name, rebuild_db=False):
+    def __init__(self, host: str, port: int, db_host: str, db_port: int, user: str, password: str, db_name: str,
+                 rebuild_db: bool = False):
         self.host = host
         self.port = port
 
@@ -37,26 +38,26 @@ class Server:
         self.app.add_url_rule('/get_users_info', view_func=self.get_users_info)
         self.app.register_error_handler(404, self.page_not_found)
 
-    def page_not_found(self, error_description):
+    def page_not_found(self, error_description: str) -> tuple[str, int]:
         return jsonify(error=str(error_description)), 404
 
-    def run_server(self):
+    def run_server(self) -> None:
         self.server = threading.Thread(target=self.app.run, kwargs={'host': self.host, 'port': self.port})
         self.server.start()
         return self.server
 
-    def shutdown_server(self):
+    def shutdown_server(self) -> None:
         request.get(f'http://{self.host}:{self.port}/shutdown')
 
-    def shutdown(self):
+    def shutdown(self) -> None:
         terminate_func = request.environ.get('werkzeug.server.shutdown')
         if terminate_func:
             terminate_func()
 
-    def get_home(self):
+    def get_home(self) -> str:
         return 'Hello, api server.'
 
-    def add_user_info(self):
+    def add_user_info(self) -> tuple[str, int]:
         request_body = dict(request.json)
         username = request_body.get('username', None)
         password = request_body.get('password', None)
@@ -68,14 +69,14 @@ class Server:
         )
         return f'Successfully added {username}', 201
 
-    def get_user_info(self, username):
+    def get_user_info(self, username: str) -> tuple[str, int]:
         try:
             user_info = self.db_interaction.get_user_info(username)
             return user_info, 200
         except UserNotFoundException:
             abort(404, description='User not found')
 
-    def edit_user_info(self, username):
+    def edit_user_info(self, username: str) -> tuple[str, int]:
         request_body = dict(request.json)
         new_username = request_body.get('username', None)
         new_password = request_body.get('password', None)
@@ -91,7 +92,7 @@ class Server:
         except UserNotFoundException:
             abort(404, description='User not found')
 
-    def delete_user_info(self, username):
+    def delete_user_info(self, username: str) -> tuple[str, int]:
         try:
             self.db_interaction.delete_user_info(username)
             return f'Successfully deleted {username}', 200

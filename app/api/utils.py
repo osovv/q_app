@@ -1,4 +1,4 @@
-def config_parser(config_path):
+def config_parser(config_path: str) -> dict:
     with open(config_path, 'r') as config_file:
         config = dict()
         lines = config_file.readlines()

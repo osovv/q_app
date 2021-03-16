@@ -5,7 +5,7 @@ from flask import jsonify
 
 
 class DbInteraction:
-    def __init__(self, host, port, user, password, db_name, rebuild_db=False):
+    def __init__(self, host: str, port: int, user: str, password: str, db_name: str, rebuild_db: bool = False):
         self.postgresql_connection = PostgreSQLConnection(
             host=host,
             port=port,
@@ -20,26 +20,26 @@ class DbInteraction:
             self.create_table_users()
             self.create_table_musical_compositions()
 
-    def create_table_users(self):
+    def create_table_users(self) -> None:
         if not self.engine.dialect.has_table(self.engine, 'users'):
             Base.metadata.tables['users'].create(self.engine)
         else:
             self.postgresql_connection.execute_query('DROP TABLE IF EXISTS users')
             Base.metadata.tables['users'].create(self.engine)
 
-    def create_table_musical_compositions(self):
+    def create_table_musical_compositions(self) -> None:
         if not self.engine.dialect.has_table(self.engine, 'users'):
             Base.metadata.tables['musical_compositions'].create(self.engine)
         else:
             self.postgresql_connection.execute_query('DROP TABLE IF EXISTS musical_compositions')
             Base.metadata.tables['musical_compositions'].create(self.engine)
 
-    def add_user_info(self, username, email, password):
+    def add_user_info(self, username: str, email: str, password: str) -> dict[str, str]:
         user = User(username=username, password=password, email=email)
         self.postgresql_connection.session.add(user)
         return self.get_user_info(username)
 
-    def get_user_info(self, username):
+    def get_user_info(self, username: str) -> dict[str, str]:
         user = self.postgresql_connection.session.query(User).filter_by(username=username).first()
         if user:
             self.postgresql_connection.session.expire_all()
@@ -47,7 +47,8 @@ class DbInteraction:
         else:
             raise UserNotFoundException('User not found!')
 
-    def edit_user_info(self, username, new_username=None, new_password=None, new_email=None):
+    def edit_user_info(self, username: str, new_username: str = None, new_password: str = None,
+                       new_email: str = None) -> dict[str, str]:
         user = self.postgresql_connection.session.query(User).filter_by(username=username).first()
         if user:
             if new_username is not None:
@@ -60,20 +61,20 @@ class DbInteraction:
         else:
             raise UserNotFoundException('User not found.')
 
-    def delete_user_info(self, username):
+    def delete_user_info(self, username: str) -> None:
         user = self.postgresql_connection.session.query(User).filter_by(username=username).first()
         if user:
             self.postgresql_connection.ses1sion.delete(user)
         else:
             raise UserNotFoundException('User not found.')
 
-    def get_all_users(self):
+    def get_all_users(self) -> str:
         users = self.postgresql_connection.session.query(User).all()
         return jsonify(users)
 
-    def get_musical_composition_info(self):
+    def get_musical_composition_info(self) -> None:
         pass
 
-    def list_all_musical_compositions(self):
+    def list_all_musical_compositions(self) -> str:
         musical_compositions = self.postgresql_connection.session.query(MusicalComposition).all()
         return jsonify(musical_compositions)
