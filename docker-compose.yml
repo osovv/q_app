@@ -30,31 +30,3 @@ services:
           condition: service_healthy
 volumes:
   pg_data: {}
-
-
-#version: '2.1'
-#
-#services:
-#  flask_app_database:
-#    container_name: flask_app_database
-#    image: "mysql:latest"
-#    environment:
-#      MYSQL_DATABASE: some_db
-#      MYSQL_ROOT_PASSWORD: pass
-#    ports:
-#      - 3306:3306
-#    healthcheck:
-#      test: [ "CMD", "mysqladmin", "-uroot", "-ppass", "ping", "-h", "127.0.0.1" ]
-#      timeout: 20s
-#      retries: 10
-#
-#  app_server:
-#    container_name: flask_app_server
-#    build: ./
-#    ports:
-#      - 5005:5005
-#    links:
-#      - flask_app_database:flask_app_database
-#    depends_on:
-#      flask_app_database:
-#        condition: service_healthy
