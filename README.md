@@ -7,7 +7,7 @@ The idea is that users can register and add some music compositions (something l
 ## Docker Dependencies
 ```
 python:3.9.2
-mysql:latest
+postgres:13.2
 ```
 ## Instructions
 Run:
@@ -16,6 +16,10 @@ docker-compose up
 ```
 Now you can connect to API at `0.0.0.0:5005`
 ## Task List
- - [x] Finish CRUD functionality for user (now only CRU)
+ - [ ] Write tests for requests.
  - [ ] Write CRUD functionality for musical compositions
  - [ ] Create simple frontend to visualize users and musical compositions
+ - [ ] Get settings from environmental variables.
+
+## Done Tasks List
+ - [x] Finish CRUD functionality for user (now only CRU)
