@@ -1,7 +1,9 @@
 from app.db.client.client import PostgreSQLConnection
-from app.db.exceptions import UserNotFoundException
+from app.db.exceptions import UserNotFoundException, UserAlreadyExistsException
 from app.db.models.models import Base, User, MusicalComposition
 from flask import jsonify
+from psycopg2.errors import UniqueViolation
+from sqlalchemy.exc import IntegrityError
 
 
 class DbInteraction:
@@ -15,32 +17,30 @@ class DbInteraction:
             rebuild_db=rebuild_db
         )
         self.engine = self.postgresql_connection.connection.engine
+
+        if rebuild_db:
+            Base.metadata.drop_all(self.engine)
         if not self.engine.dialect.has_table(self.engine, 'users'):
             Base.metadata.tables['users'].create(self.engine)
         if not self.engine.dialect.has_table(self.engine, 'users'):
             Base.metadata.tables['musical_compositions'].create(self.engine)
-        if rebuild_db:
-            self.create_table_users()
-            self.create_table_musical_compositions()
 
     def create_table_users(self) -> None:
         if not self.engine.dialect.has_table(self.engine, 'users'):
-            Base.metadata.tables['users'].create(self.engine)
-        else:
-            self.postgresql_connection.execute_query('DROP TABLE IF EXISTS users')
             Base.metadata.tables['users'].create(self.engine)
 
     def create_table_musical_compositions(self) -> None:
         if not self.engine.dialect.has_table(self.engine, 'users'):
             Base.metadata.tables['musical_compositions'].create(self.engine)
-        else:
-            self.postgresql_connection.execute_query('DROP TABLE IF EXISTS musical_compositions')
-            Base.metadata.tables['musical_compositions'].create(self.engine)
 
     def add_user_info(self, username: str, email: str, password: str) -> dict[str, str]:
-        user = User(username=username, password=password, email=email)
-        self.postgresql_connection.session.add(user)
-        return self.get_user_info(username)
+        try:
+            user = User(username=username, password=password, email=email)
+            self.postgresql_connection.session.add(user)
+            return self.get_user_info(username)
+        except IntegrityError as e:
+            assert isinstance(e.orig, UniqueViolation)  # proves the original exception
+            raise UserAlreadyExistsException from e
 
     def get_user_info(self, username: str) -> dict[str, str]:
         user = self.postgresql_connection.session.query(User).filter_by(username=username).first()

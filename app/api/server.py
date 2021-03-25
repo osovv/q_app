@@ -6,7 +6,7 @@ from werkzeug.exceptions import abort
 from app.api.utils import config_parser
 from flask import Flask, request, jsonify
 
-from app.db.exceptions import UserNotFoundException
+from app.db.exceptions import UserNotFoundException, UserAlreadyExistsException
 from app.db.interaction.interaction import DbInteraction
 
 
@@ -64,12 +64,15 @@ class Server:
         username = request_body.get('username', None)
         password = request_body.get('password', None)
         email = request_body.get('email', None)
-        self.db_interaction.add_user_info(
-            username=username,
-            password=password,
-            email=email
-        )
-        return f'Successfully added {username}', 201
+        try:
+            self.db_interaction.add_user_info(
+                username=username,
+                password=password,
+                email=email
+            )
+            return f'Successfully added {username}', 201
+        except UserAlreadyExistsException:
+            return f'User {username} already exists.', 403
 
     def get_user(self, username: str) -> tuple[dict[str, str], int]:
         try:
@@ -114,6 +117,7 @@ if __name__ == 'app.api.server':
         user='tests',
         password='tests',
         db_name='flask_app_tests_db',
+        rebuild_db=True
     )
     test_client = server.app.test_client()
     server.run()
