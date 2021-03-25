@@ -6,7 +6,7 @@ from werkzeug.exceptions import abort
 from app.api.utils import config_parser
 from flask import Flask, request, jsonify
 
-from app.db.exceptions import UserNotFoundException, UserAlreadyExistsException
+from app.db.exceptions import UserNotFoundException, UsernameAlreadyExistsException, EmailAlreadyExistsException
 from app.db.interaction.interaction import DbInteraction
 
 
@@ -71,8 +71,10 @@ class Server:
                 email=email
             )
             return f'Successfully added {username}', 201
-        except UserAlreadyExistsException:
-            return f'User {username} already exists.', 403
+        except UsernameAlreadyExistsException:
+            return f'User with username "{username}" already exists.', 403
+        except EmailAlreadyExistsException:
+            return f'User with email "{email}" already exists.', 403
 
     def get_user(self, username: str) -> tuple[dict[str, str], int]:
         try:

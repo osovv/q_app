@@ -1,5 +1,7 @@
+import re
+
 from app.db.client.client import PostgreSQLConnection
-from app.db.exceptions import UserNotFoundException, UserAlreadyExistsException
+from app.db.exceptions import UserNotFoundException, UsernameAlreadyExistsException, EmailAlreadyExistsException
 from app.db.models.models import Base, User, MusicalComposition
 from flask import jsonify
 from psycopg2.errors import UniqueViolation
@@ -39,8 +41,12 @@ class DbInteraction:
             self.postgresql_connection.session.add(user)
             return self.get_user_info(username)
         except IntegrityError as e:
-            assert isinstance(e.orig, UniqueViolation)  # proves the original exception
-            raise UserAlreadyExistsException from e
+            assert isinstance(e.orig, UniqueViolation)
+            key_name = re.search('\((\w*)\)', e.args[0].split('\n')[1]).group(1)
+            if key_name == 'email':
+                raise EmailAlreadyExistsException from e
+            if key_name == 'username':
+                raise UsernameAlreadyExistsException from e
 
     def get_user_info(self, username: str) -> dict[str, str]:
         user = self.postgresql_connection.session.query(User).filter_by(username=username).first()

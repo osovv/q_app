@@ -2,5 +2,9 @@ class UserNotFoundException(Exception):
     pass
 
 
-class UserAlreadyExistsException(Exception):
+class UsernameAlreadyExistsException(Exception):
+    pass
+
+
+class EmailAlreadyExistsException(BaseException):
     pass
