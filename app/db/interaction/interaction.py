@@ -14,8 +14,11 @@ class DbInteraction:
             db_name=db_name,
             rebuild_db=rebuild_db
         )
-
         self.engine = self.postgresql_connection.connection.engine
+        if not self.engine.dialect.has_table(self.engine, 'users'):
+            Base.metadata.tables['users'].create(self.engine)
+        if not self.engine.dialect.has_table(self.engine, 'users'):
+            Base.metadata.tables['musical_compositions'].create(self.engine)
         if rebuild_db:
             self.create_table_users()
             self.create_table_musical_compositions()
@@ -64,7 +67,7 @@ class DbInteraction:
     def delete_user_info(self, username: str) -> None:
         user = self.postgresql_connection.session.query(User).filter_by(username=username).first()
         if user:
-            self.postgresql_connection.ses1sion.delete(user)
+            self.postgresql_connection.session.delete(user)
         else:
             raise UserNotFoundException('User not found.')
 
