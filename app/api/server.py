@@ -59,22 +59,22 @@ class Server:
     def shutdown_server(self) -> None:
         request.get(f'http://{self.host}:{self.port}/shutdown')
 
-    def add_user_info(self) -> tuple[str, int]:
+    def add_user_info(self) -> tuple[dict[str, str], int]:
         request_body = dict(request.json)
         username = request_body.get('username', None)
         password = request_body.get('password', None)
         email = request_body.get('email', None)
         try:
-            self.db_interaction.add_user_info(
+            user_info = self.db_interaction.add_user_info(
                 username=username,
                 password=password,
                 email=email
             )
-            return f'Successfully added {username}', 201
+            return user_info, 201
         except UsernameAlreadyExistsException:
-            return f'User with username "{username}" already exists.', 403
+            abort(404, description=f'User with username "{username}" already exists.')
         except EmailAlreadyExistsException:
-            return f'User with email "{email}" already exists.', 403
+            abort(404, description=f'User with email "{email}" already exists.')
 
     def get_user(self, username: str) -> tuple[dict[str, str], int]:
         try:
@@ -83,28 +83,28 @@ class Server:
         except UserNotFoundException:
             abort(404, description='User not found')
 
-    def update_user(self, username: str) -> tuple[str, int]:
+    def update_user(self, username: str) -> tuple[dict[str, str], int]:
         request_body = dict(request.json)
         new_username = request_body.get('username', None)
         new_password = request_body.get('password', None)
         new_email = request_body.get('email', None)
         try:
-            self.db_interaction.edit_user_info(
+            user_info = self.db_interaction.edit_user_info(
                 username=username,
                 new_username=new_username,
                 new_password=new_password,
                 new_email=new_email
             )
-            return f'Successfully edited {username}', 200
+            return user_info, 200
         except UserNotFoundException:
             abort(404, description='User not found')
 
-    def delete_user(self, username: str) -> tuple[str, int]:
+    def delete_user(self, username: str) -> tuple[dict[str, str], int]:
         try:
             self.db_interaction.delete_user_info(username)
-            return f'Successfully deleted {username}', 200
+            return {'message': f'Successfully deleted {username}'}, 200
         except UserNotFoundException:
-            abort(404, description='User not found')
+            abort(404, description=f'User "{username}" not found')
 
     def get_users(self):
         return self.db_interaction.get_all_users(), 200
@@ -113,7 +113,7 @@ class Server:
 if __name__ == 'app.api.server':
     server = Server(
         host='0.0.0.0',
-        port=5501,
+        port=5008,
         db_host='0.0.0.0',
         db_port=5432,
         user='tests',
