@@ -78,16 +78,18 @@ def test_put_not_existing():
     assert resp.get_json() == {"error": "404 Not Found: User not found"}
 
 
-"""
-For some reason flask.app.test_client.delete() doesn't work. Need to look it up.
-
 def test_delete_existing():
+    resp_get = test_client.get('/user/andrew')
+    assert resp_get.status_code == 200
     resp = test_client.delete('/user/andrew')
-    assert resp.status_code == 200
+    assert resp.status_code == 204
+    resp_get = test_client.get('/user/andrew')
+    assert resp_get.status_code == 404
 
 
 def test_delete_not_existing():
+    resp_get = test_client.get('/user/matthew')
+    assert resp_get.status_code == 404
     resp = test_client.delete('/user/matthew')
     assert resp.status_code == 404
-    assert resp.get_json() == {"error": "404 Not Found: User not found"}
-"""
+    assert resp.get_json() == {'error': '404 Not Found: User matthew not found'}
