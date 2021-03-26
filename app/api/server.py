@@ -1,11 +1,9 @@
 import threading
 import argparse
 
-from werkzeug.exceptions import abort
+from flask import Flask, request, jsonify, abort
 
 from app.api.utils import config_parser
-from flask import Flask, request, jsonify
-
 from app.db.exceptions import UserNotFoundException, UsernameAlreadyExistsException, EmailAlreadyExistsException
 from app.db.interaction.interaction import DbInteraction
 
@@ -43,10 +41,11 @@ class Server:
         return jsonify(error=str(error_description)), 404
 
     @staticmethod
-    def shutdown() -> None:
+    def shutdown() -> int:
         terminate_func = request.environ.get('werkzeug.server.shutdown')
         if terminate_func:
             terminate_func()
+            return 200
 
     @staticmethod
     def get_home() -> str:
@@ -102,9 +101,9 @@ class Server:
     def delete_user(self, username: str) -> tuple[dict[str, str], int]:
         try:
             self.db_interaction.delete_user_info(username)
-            return {'message': f'Successfully deleted {username}'}, 200
+            return {'message': f'Successfully deleted {username}'}, 204
         except UserNotFoundException:
-            abort(404, description=f'User "{username}" not found')
+            abort(404, description=f'User {username} not found')
 
     def get_users(self):
         return self.db_interaction.get_all_users(), 200
