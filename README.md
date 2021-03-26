@@ -16,6 +16,7 @@ docker-compose up
 ```
 Now you can connect to API at `0.0.0.0:5005`
 ## Task List
+ - [ ] Configure Docker to automatically create users for databases.
  - [ ] Manage creation of database and tables if they do not exist.
  - [ ] Write tests for requests.
  - [ ] Write CRUD functionality for musical compositions
