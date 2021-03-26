@@ -1,7 +1,8 @@
 import re
 
 from app.db.client.client import PostgreSQLConnection
-from app.db.exceptions import UserNotFoundException, UsernameAlreadyExistsException, EmailAlreadyExistsException
+from app.db.exceptions import UserNotFoundException, UsernameAlreadyExistsException, EmailAlreadyExistsException, \
+    MusicalCompositionNotFoundException
 from app.db.models.models import Base, User, MusicalComposition
 from flask import jsonify
 from psycopg2.errors import UniqueViolation
@@ -24,7 +25,7 @@ class DbInteraction:
             Base.metadata.drop_all(self.engine)
         if not self.engine.dialect.has_table(self.engine, 'users'):
             Base.metadata.tables['users'].create(self.engine)
-        if not self.engine.dialect.has_table(self.engine, 'users'):
+        if not self.engine.dialect.has_table(self.engine, 'musical_compositions'):
             Base.metadata.tables['musical_compositions'].create(self.engine)
 
     def create_table_users(self) -> None:
@@ -32,7 +33,7 @@ class DbInteraction:
             Base.metadata.tables['users'].create(self.engine)
 
     def create_table_musical_compositions(self) -> None:
-        if not self.engine.dialect.has_table(self.engine, 'users'):
+        if not self.engine.dialect.has_table(self.engine, 'musical_compositions'):
             Base.metadata.tables['musical_compositions'].create(self.engine)
 
     def add_user_info(self, username: str, email: str, password: str) -> dict[str, str]:
@@ -54,7 +55,7 @@ class DbInteraction:
             self.postgresql_connection.session.expire_all()
             return {'username': user.username, 'email': user.email, 'password': user.password}
         else:
-            raise UserNotFoundException('User not found!')
+            raise UserNotFoundException(f'User {username} not found!')
 
     def edit_user_info(self, username: str, new_username: str = None, new_password: str = None,
                        new_email: str = None) -> dict[str, str]:
@@ -68,14 +69,14 @@ class DbInteraction:
                 user.email = new_email
             return self.get_user_info(username if new_username is None else new_username)
         else:
-            raise UserNotFoundException('User not found.')
+            raise UserNotFoundException(f'User {username} not found.')
 
     def delete_user_info(self, username: str) -> None:
         user = self.postgresql_connection.session.query(User).filter_by(username=username).first()
         if user:
             self.postgresql_connection.session.delete(user)
         else:
-            raise UserNotFoundException('User not found.')
+            raise UserNotFoundException(f'User {username} not found.')
 
     def get_all_users(self) -> str:
         users = self.postgresql_connection.session.query(User).all()
