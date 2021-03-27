@@ -17,4 +17,4 @@ WORKDIR /project
 
 EXPOSE 5005
 
-CMD ["python", "./app/api/server.py", "--config=./app/api/config.txt"]
+CMD ["python", "app/api/server.py", "--config=app/api/config.txt"]
