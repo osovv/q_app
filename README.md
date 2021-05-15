@@ -1,4 +1,9 @@
 # Simple Flask app
+**IMPORTANT NOTICE**:
+
+This project was abandoned to work on [Musicality](https://github.com/osovv/musicality).
+Musicality bases on ideas of this project, but is built better, more scalable, has better test coverage and also provides easier extensiblity.
+
 ## Description
 A simple web application written in Flask.
 Created by the following [this](https://www.youtube.com/watch?v=LcZ9uJn8ffA) video.\
